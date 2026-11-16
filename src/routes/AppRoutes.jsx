@@ -11,7 +11,7 @@ function AppRoutes() {
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<Socios />} />
+        <Route path="/" element={<Dashboard />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/socios" element={<Socios />} />
         <Route path="/socios/nuevo" element={<NuevoSocio />} />

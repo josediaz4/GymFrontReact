@@ -7,6 +7,7 @@ import {
 function Asistencias() {
   const [asistencias, setAsistencias] = useState([]);
   const [busqueda, setBusqueda] = useState("");
+  const [estadoFiltro, setEstadoFiltro] = useState("todos");
 
   useEffect(() => {
     cargarAsistencias();
@@ -22,9 +23,19 @@ function Asistencias() {
     }
   };
   //Filtrar asistencias
-  const filtradas = asistencias.filter((a) =>
-    a.nombreCompletoSocio?.toLowerCase().includes(busqueda.toLowerCase()),
-  );
+  const filtradas = asistencias.filter((a) => {
+    const conincideBusqueda = a.nombreCompletoSocio
+      ?.toLowerCase()
+      .includes(busqueda.toLowerCase());
+    const coincideEstado =
+      estadoFiltro === "todos"
+        ? true
+        : estadoFiltro === "validas"
+          ? a.asistenciaValida
+          : !a.asistenciaValida;
+
+    return conincideBusqueda && coincideEstado;
+  });
   //Invalidar asistencia
   const handleInvalidar = async (idAsistencia) => {
     const confirmar = window.confirm("¿Invalidar esta asistencia?");
@@ -43,13 +54,54 @@ function Asistencias() {
     <div className="container-fluid">
       <div className="d-flex justify-content-between align-item-center mb-4">
         <h2>Asistencias</h2>
-        <input
-          type="text"
-          className="form-contro w-25"
-          placeholder="Buscar socio por ID..."
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-        />
+        <div className="d-flex gap-2">
+          <input
+            type="text"
+            className="form-contro w-30"
+            placeholder="Buscar socio por nombre..."
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+          />
+          <select
+            className="form-select w-30"
+            value={estadoFiltro}
+            onChange={(e) => setEstadoFiltro(e.target.value)}
+          >
+            <option value="todas">Todas</option>
+            <option value="validas">Válidas</option>
+            <option value="invalidas">Invalidas</option>
+          </select>
+        </div>
+      </div>
+      <div className="row mb-4">
+        <div className="col-md-4">
+          <div className="card shadow border-0">
+            <div className="card-body">
+              <h6 className="text-muted">Total Asistencias</h6>
+              <h2>{asistencias.length}</h2>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="card shadow border-0">
+            <div className="card-body">
+              <h6 className="text-muted">Asistencias Válidas</h6>
+              <h2 className="text-success">
+                {asistencias.filter((a) => a.asistenciaValida).length}
+              </h2>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="card shadow border-0">
+            <div className="card-body">
+              <h6 className="text-muted">Total Invalidas</h6>
+              <h2 className="text-danger">
+                {asistencias.filter((a) => !a.asistenciaValida).length}
+              </h2>
+            </div>
+          </div>
+        </div>
       </div>
       <div className="card shadow">
         <div className="card-bod">
