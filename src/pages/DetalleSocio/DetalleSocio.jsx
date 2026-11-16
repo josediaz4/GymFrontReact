@@ -130,6 +130,14 @@ function DetalleSocio() {
       alert("Error al invalidar la asistencia.");
     }
   };
+  //Formateador para moneda
+  const formatearMoneda = (valor) => {
+    return new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+      maximumFractionDigits: 0,
+    }).format(valor);
+  };
 
   if (!membresia) return <p>Cargando...</p>;
 
@@ -201,7 +209,7 @@ function DetalleSocio() {
                 <tr key={pago.idPago}>
                   <td>{new Date(pago.fechaPago).toLocaleDateString()}</td>
                   <td>{pago.nombrePlan}</td>
-                  <td>$ {pago.monto}</td>
+                  <td>{formatearMoneda(pago.monto)}</td>
                   <td>{pago.metodoPago}</td>
                 </tr>
               ))}
