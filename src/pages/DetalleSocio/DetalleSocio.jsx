@@ -235,7 +235,7 @@ function DetalleSocio() {
                     )}
                   </td>
                   <td>
-                    {asistencia.asistenciaValida && (
+                    {asistencia.asistenciaValida ? (
                       <button
                         className="btn btn-danger btn-sm"
                         onClick={() =>
@@ -244,6 +244,8 @@ function DetalleSocio() {
                       >
                         Invalidar
                       </button>
+                    ) : (
+                      <span className="text-muted">Sin acciones</span>
                     )}
                   </td>
                 </tr>

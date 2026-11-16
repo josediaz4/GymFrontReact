@@ -1,5 +1,10 @@
 import apiClient from "../api/apiClient";
 
+export const getAsistencias = async () => {
+  const response = await apiClient.get("/asistencias");
+  return response.data;
+};
+
 export const getResumenAsistencias = async (idSocio) => {
   const response = await apiClient.get(`/asistencias/resumen/${idSocio}`);
   return response.data;

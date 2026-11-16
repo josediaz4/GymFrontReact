@@ -4,6 +4,8 @@ import NuevoSocio from "../pages/NuevoSocio/NuevoSocio";
 import Layout from "../components/Layout/Layout";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import DetalleSocio from "../pages/DetalleSocio/DetalleSocio";
+import Pagos from "../pages/Pagos/Pagos";
+import Asistencias from "../pages/Asistencias/Asistencias";
 
 function AppRoutes() {
   return (
@@ -14,6 +16,8 @@ function AppRoutes() {
         <Route path="/socios" element={<Socios />} />
         <Route path="/socios/nuevo" element={<NuevoSocio />} />
         <Route path="/socios/:id" element={<DetalleSocio />} />
+        <Route path="/pagos" element={<Pagos />} />
+        <Route path="/asistencias" element={<Asistencias />} />
       </Routes>
     </Layout>
   );
