@@ -25,6 +25,7 @@ function DetalleSocio() {
     idPlan: "",
     metodoPago: "Efectivo",
   });
+  const [error, setError] = useState("");
 
   useEffect(() => {
     cargarDatos();
@@ -71,7 +72,7 @@ function DetalleSocio() {
       const data = await getPlanes();
       setPlanes(data);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setError("Error al cargar los planes.");
     }
   };
@@ -307,7 +308,7 @@ function DetalleSocio() {
                     }
                   >
                     <option>Efectivo</option>
-                    <option>Tranferencia</option>
+                    <option>Transferencia</option>
                   </select>
                 </div>
                 <div className="modal-footer">

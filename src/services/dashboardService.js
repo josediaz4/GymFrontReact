@@ -6,6 +6,6 @@ export const getSocios = async () => {
 };
 
 export const getProximosVencimientos = async () => {
-  const response = await apiClient("/socios/proximos-vencimientos");
+  const response = await apiClient.get("/socios/proximos-vencimientos");
   return response.data;
 };

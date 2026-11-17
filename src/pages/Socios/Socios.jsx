@@ -30,8 +30,8 @@ function Socios() {
   };
 
   return (
-    <div className="container mt-4">
-      <h2>Socios</h2>
+    <div className="container-fluid">
+      <h2 className="mb-4">Socios</h2>
       <table className="table table-striped">
         <thead>
           <tr>

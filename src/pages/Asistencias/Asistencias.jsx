@@ -52,12 +52,12 @@ function Asistencias() {
 
   return (
     <div className="container-fluid">
-      <div className="d-flex justify-content-between align-item-center mb-4">
+      <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Asistencias</h2>
         <div className="d-flex gap-2">
           <input
             type="text"
-            className="form-contro w-30"
+            className="form-control w-30"
             placeholder="Buscar socio por nombre..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
@@ -67,7 +67,7 @@ function Asistencias() {
             value={estadoFiltro}
             onChange={(e) => setEstadoFiltro(e.target.value)}
           >
-            <option value="todas">Todas</option>
+            <option value="todos">Todas</option>
             <option value="validas">Válidas</option>
             <option value="invalidas">Invalidas</option>
           </select>
@@ -104,7 +104,7 @@ function Asistencias() {
         </div>
       </div>
       <div className="card shadow">
-        <div className="card-bod">
+        <div className="card-body">
           <table className="table table-striped">
             <thead>
               <tr>

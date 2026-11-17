@@ -33,7 +33,7 @@ function Pagos() {
       ?.toLowerCase()
       .includes(busqueda.toLowerCase());
     const coincideMetodo =
-      filtroPlan === "" || pago.metodoPago === filtroMetodo;
+      filtroMetodo === "" || pago.metodoPago === filtroMetodo;
     const coincidePlan = filtroPlan === "" || pago.nombrePlan === filtroPlan;
 
     return coincideNombre && coincideMetodo && coincidePlan;
@@ -67,7 +67,8 @@ function Pagos() {
         {/* Filtro por nombre */}
         <input
           type="text"
-          className="form-control w-25"
+          className="form-control"
+          style={{ width: "220px" }}
           placeholder="Buscar socio..."
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
@@ -75,7 +76,8 @@ function Pagos() {
 
         {/* Filtro por metodo pago */}
         <select
-          className="format-select w-30"
+          className="form-select"
+          style={{ width: "180px" }}
           value={filtroMetodo}
           onChange={(e) => setFiltroMetodo(e.target.value)}
         >
@@ -89,7 +91,8 @@ function Pagos() {
 
         {/* Filtro por plan */}
         <select
-          className="format-select"
+          className="form-select"
+          style={{ width: "180px" }}
           value={filtroPlan}
           onChange={(e) => setFiltroPlan(e.target.value)}
         >
