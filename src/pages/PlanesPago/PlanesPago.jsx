@@ -5,8 +5,15 @@ import {
   eliminarPlan,
   getPlanes,
 } from "../../services/planesService";
+import { mensajeError } from "../../utils/mensajeError";
+import { toast } from "react-toastify";
 
-const planVacio = { nombrePlan: "", precio: "", cantidadClases: "" };
+const planVacio = {
+  nombrePlan: "",
+  precio: "",
+  cantidadClases: "",
+  duracionDias: "",
+};
 
 function PlanesPago() {
   const [planes, setPlanes] = useState([]);
@@ -49,6 +56,7 @@ function PlanesPago() {
       nombrePlan: plan.nombrePlan,
       precio: plan.precio,
       cantidadClases: plan.cantidadClases ?? "",
+      duracionDias: plan.duracionDias ?? "",
     });
     setError("");
     setMostrarModal(true);
@@ -66,6 +74,7 @@ function PlanesPago() {
       nombrePlan: formData.nombrePlan.trim(),
       precio: parseFloat(formData.precio),
       cantidadClases: parseInt(formData.cantidadClases),
+      duracionDias: parseInt(formData.duracionDias),
     };
 
     try {
@@ -76,9 +85,10 @@ function PlanesPago() {
       }
       setMostrarModal(false);
       await cargarPlanes();
+      toast.success("Plan creado correctamente.");
     } catch (err) {
       console.error(err);
-      setError(err.response?.data.mensaje || "Error al guardar el plan.");
+      setError(mensajeError(err, "Error al guardar el plan."));
     }
   };
   //eliminar
@@ -87,12 +97,10 @@ function PlanesPago() {
     try {
       await eliminarPlan(plan.idPlan);
       await cargarPlanes();
+      toast.success("Plan borrado correctamente.");
     } catch (err) {
       console.error(err);
-      alert(
-        err.response?.data?.mensaje ||
-          "No se pudo eliminar (puede tener socios o pagos asociados)",
-      );
+      toast.error(mensajeError(err, "No se pudo eliminar el socio."));
     }
   };
 
@@ -116,6 +124,7 @@ function PlanesPago() {
                 <th>Plan</th>
                 <th>Precio</th>
                 <th>Clases Permitidas</th>
+                <th>Duración en Dias</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -125,6 +134,7 @@ function PlanesPago() {
                   <td>{plan.nombrePlan}</td>
                   <td>{formatearMoneda(plan.precio)}</td>
                   <td>{plan.cantidadClases}</td>
+                  <td>{plan.duracionDias}</td>
                   <td className="d-flex gap-2">
                     <button
                       className="btn btn-primary btn-sm"
@@ -203,6 +213,18 @@ function PlanesPago() {
                       name="cantidadClases"
                       min="1"
                       value={formData.cantidadClases}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="label-form">Duración en dias</label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      name="duracionDias"
+                      min="1"
+                      value={formData.duracionDias}
                       onChange={handleChange}
                       required
                     />

@@ -12,6 +12,8 @@ import {
   invalidarAsistencia,
   getAsistenciasPorSocio,
 } from "../../services/asistenciasService";
+import { mensajeError } from "../../utils/mensajeError";
+import { toast } from "react-toastify";
 
 function DetalleSocio() {
   const { id } = useParams();
@@ -53,18 +55,6 @@ function DetalleSocio() {
         estadoMembresia: 2,
       });
     }
-    //   try {
-    //     const historialData = await getHistorialPagos(id);
-    //     setHistorial(historialData);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    //   try {
-    //     const resumenData = await getResumenAsistencias(id);
-    //     setResumen(resumenData);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
   };
 
   const cargarPlanes = async () => {
@@ -96,9 +86,10 @@ function DetalleSocio() {
 
       //Cerrar modal
       setMostrarModal(false);
-    } catch (error) {
-      console.log(error);
-      alert("Error al renovar");
+      toast.success("Membresía renovada correctament.");
+    } catch (err) {
+      console.log(err);
+      toast.error(mensajeError(err, "Error al renovar la membresía."));
     }
   };
   //Estado personalizados con colores
@@ -117,8 +108,9 @@ function DetalleSocio() {
     try {
       await registarAsistncia(parseInt(id));
       await cargarDatos();
-    } catch (error) {
-      alert(error.response?.data?.mensaje);
+      toast.alert("Asistencia registada correctamente.");
+    } catch (err) {
+      toast.success(mensajeError(err, "Error al registrar la asistencia."));
     }
   };
   //Invalidar asistencia
@@ -126,9 +118,10 @@ function DetalleSocio() {
     try {
       await invalidarAsistencia(idAsistencia);
       await cargarDatos();
-    } catch (error) {
-      console.log(error);
-      alert("Error al invalidar la asistencia.");
+      toast.success("Asistencia invalidada correctamente.");
+    } catch (err) {
+      console.log(err);
+      toast.error(mensajeError(err, "Error al invalidar la asistencia."));
     }
   };
   //Formateador para moneda

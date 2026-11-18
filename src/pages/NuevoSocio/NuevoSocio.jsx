@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { getPlanes } from "../../services/planesService";
 import { crearSocio } from "../../services/sociosService";
+import { toast } from "react-toastify";
+import { mensajeError } from "../../utils/mensajeError";
 
 function NuevoSocio() {
   const [planes, setPlanes] = useState([]);
@@ -48,7 +50,7 @@ function NuevoSocio() {
         ...formData,
         idPlan: parseInt(formData.idPlan),
       });
-      setMensaje("✅ Socio creado correctamente");
+      toast.success("Socio creado correctamente.");
 
       setFormData({
         nombre: "",
@@ -61,7 +63,7 @@ function NuevoSocio() {
       });
     } catch (err) {
       console.log(err);
-      setError(err.response?.data || "Error al crear el socio.");
+      toast.error(mensajeError(err, "No se pudo crear el socio."));
     }
   };
 

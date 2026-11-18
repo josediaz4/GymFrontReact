@@ -44,9 +44,10 @@ function Asistencias() {
     try {
       await invalidarAsistencia(idAsistencia);
       await cargarAsistencias();
-    } catch (error) {
-      console.error(error);
-      alert("Error al invalidar asistencia");
+      toast.success("Asistencia invalidada correctamente.");
+    } catch (err) {
+      console.error(err);
+      toast.error(mensajeError(err, "Error al invalidar la asistencia."));
     }
   };
 
