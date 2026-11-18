@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import {
   actualizarSocio,
-  eliminarSocio,
+  suspenderSocio,
+  reactivarSocio,
   getSocioPorId,
   getSocios,
 } from "../../services/sociosService";
@@ -104,21 +105,23 @@ function Socios() {
       setError(mensajeError(err, "Error al guardar el socio."));
     }
   };
-  //Eliminar
-  const handleEliminar = async (socio) => {
-    if (
-      !window.confirm(
-        `Eliminar a ${socio.nombreCompleto}? Se borraran todos sus pagos y asistencias.`,
-      )
-    )
-      return;
+  //cambiar estado socio(suspender/reactivar)
+  const handleCambiarEstado = async (socio) => {
+    const suspender = socio.estadoMembresia !== 3;
+    const accion = suspender ? "Suspender" : "Reactivar";
+
+    if (!window.confirm(`¿${accion} a ${socio.nombreCompleto}?`)) return;
+
     try {
-      await eliminarSocio(socio.idSocio);
+      if (suspender) await suspenderSocio(socio.idSocio);
+      else await reactivarSocio(socio.idSocio);
       await cargarSocios();
-      toast.success("Socio eliminado");
+      toast.success(suspender ? "Socio suspendido" : "Socio reactivado");
     } catch (err) {
       console.error(err);
-      toast.error(mensajeError(err, "No se pudo eliminar el socio."));
+      toast.error(
+        mensajeError(err, `No se pudo ${accion.toLowerCase()} al socio.`),
+      );
     }
   };
 
@@ -182,10 +185,10 @@ function Socios() {
                       Editar
                     </button>
                     <button
-                      className="btn btn-danger btn-sm"
-                      onClick={() => handleEliminar(socio.idSocio)}
+                      className={`btn btn.sm ${socio.estadoMembresia === 3 ? "btn-success" : "btn-secondary"}`}
+                      onClick={() => handleCambiarEstado(socio)}
                     >
-                      Eliminar
+                      {socio.estadoMembresia === 3 ? "Reactivar" : "Suspender"}
                     </button>
                   </td>
                 </tr>

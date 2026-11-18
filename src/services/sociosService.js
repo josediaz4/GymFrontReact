@@ -20,8 +20,13 @@ export const actualizarSocio = async (id, socio) => {
   return response.data;
 };
 
-export const eliminarSocio = async (id) => {
-  const response = await apiClient.delete(`/socios/${id}`);
+export const suspenderSocio = async (id) => {
+  const response = await apiClient.put(`/socios/${id}/suspender`);
+  return response.data;
+};
+
+export const reactivarSocio = async (id) => {
+  const response = await apiClient.put(`/socios/${id}/reactivar`);
   return response.data;
 };
 

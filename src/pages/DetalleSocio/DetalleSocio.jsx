@@ -108,9 +108,9 @@ function DetalleSocio() {
     try {
       await registarAsistncia(parseInt(id));
       await cargarDatos();
-      toast.alert("Asistencia registada correctamente.");
+      toast.success("Asistencia registada correctamente.");
     } catch (err) {
-      toast.success(mensajeError(err, "Error al registrar la asistencia."));
+      toast.error(mensajeError(err, "Error al registrar la asistencia."));
     }
   };
   //Invalidar asistencia

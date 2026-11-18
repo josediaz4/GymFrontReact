@@ -14,5 +14,5 @@ export const actualizarPlan = async (id, plan) => {
 };
 export const eliminarPlan = async (id) => {
   const response = await apiClient.delete(`/planespago/${id}`);
-  response.data;
+  return response.data;
 };

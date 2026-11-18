@@ -79,13 +79,20 @@ function PlanesPago() {
 
     try {
       if (planEditado) {
-        await actualizarPlan(planEditado.idPlan, payload);
+        await actualizarPlan(planEditado.idPlan, {
+          ...payload,
+          idPlan: planEditado.idPlan,
+        });
       } else {
         await crearPlan(payload);
       }
       setMostrarModal(false);
       await cargarPlanes();
-      toast.success("Plan creado correctamente.");
+      toast.success(
+        planEditado
+          ? "Plan actualizado correctamente."
+          : "Plan actualizado correctamente.",
+      );
     } catch (err) {
       console.error(err);
       setError(mensajeError(err, "Error al guardar el plan."));
@@ -100,7 +107,7 @@ function PlanesPago() {
       toast.success("Plan borrado correctamente.");
     } catch (err) {
       console.error(err);
-      toast.error(mensajeError(err, "No se pudo eliminar el socio."));
+      toast.error(mensajeError(err, "No se pudo eliminar el plan."));
     }
   };
 
@@ -153,7 +160,7 @@ function PlanesPago() {
               ))}
               {planes.length === 0 && (
                 <tr>
-                  <td colSpan="4" className="text-center text-muted">
+                  <td colSpan="5" className="text-center text-muted">
                     No hay planes cargados.
                   </td>
                 </tr>
@@ -182,7 +189,7 @@ function PlanesPago() {
                 <div className="modal-body">
                   {error && <div className="alert alert-danger">{error}</div>}
                   <div className="mb-3">
-                    <label className="label-form">Nombre</label>
+                    <label className="form-label">Nombre</label>
                     <input
                       type="text"
                       className="form-control"
@@ -193,7 +200,7 @@ function PlanesPago() {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="label-form">Precio</label>
+                    <label className="form-label">Precio</label>
                     <input
                       type="number"
                       className="form-control"
@@ -206,7 +213,7 @@ function PlanesPago() {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="label-form">Clases permitidas</label>
+                    <label className="form-label">Clases permitidas</label>
                     <input
                       type="number"
                       className="form-control"
@@ -218,7 +225,7 @@ function PlanesPago() {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="label-form">Duración en dias</label>
+                    <label className="form-label">Duración en dias</label>
                     <input
                       type="number"
                       className="form-control"
@@ -233,7 +240,7 @@ function PlanesPago() {
                 <div className="modal-footer">
                   <button
                     type="button"
-                    className="btn btn-secondaty"
+                    className="btn btn-secondary"
                     onClick={() => setMostrarModal(false)}
                   >
                     Cancelar

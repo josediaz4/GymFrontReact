@@ -172,7 +172,7 @@ function NuevoSocio() {
                   onChange={handleChange}
                 >
                   <option value="Efectivo">Efectivo</option>
-                  <option value="Tranferencia">Transferencia</option>
+                  <option value="Transferencia">Transferencia</option>
                 </select>
               </div>
             </div>
