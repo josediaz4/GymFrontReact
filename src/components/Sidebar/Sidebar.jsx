@@ -27,6 +27,10 @@ function Sidebar() {
         <NavLink to="/planesPago" className="nav-link text-white">
           📱 Planes de Pago
         </NavLink>
+
+        <NavLink to="/horarios" className="nav-link text-white">
+          🕒 Horarios
+        </NavLink>
       </div>
     </div>
   );

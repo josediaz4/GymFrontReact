@@ -4,6 +4,7 @@ import {
   getHistorialPagos,
   getMembresiaActual,
 } from "../../services/sociosService";
+import { getInscripcionesPorSocio } from "../../services/inscripcionesService";
 import { getResumenAsistencias } from "../../services/asistenciasService";
 import { getPlanes } from "../../services/planesService";
 import { renovarMembresia } from "../../services/pagosService";
@@ -28,6 +29,8 @@ function DetalleSocio() {
     metodoPago: "Efectivo",
   });
   const [error, setError] = useState("");
+  const [clases, setClases] = useState([]);
+  const [idHorario, setIdHorario] = useState("");
 
   useEffect(() => {
     cargarDatos();
@@ -40,11 +43,13 @@ function DetalleSocio() {
       const historialData = await getHistorialPagos(id);
       const resumenData = await getResumenAsistencias(id);
       const asistenciasData = await getAsistenciasPorSocio(id);
+      const clasesDispo = await getInscripcionesPorSocio(id);
 
       setMembresia(membresiaData);
       setHistorial(historialData);
       setResumen(resumenData);
       setAsistencias(asistenciasData);
+      setClases(clasesDispo);
     } catch (error) {
       console.log(error);
 
@@ -106,7 +111,8 @@ function DetalleSocio() {
   //Registrar asistencia
   const handleRegistrarAsistencia = async () => {
     try {
-      await registarAsistncia(parseInt(id));
+      await registarAsistncia(parseInt(id), parseInt(idHorario));
+      setIdHorario("");
       await cargarDatos();
       toast.success("Asistencia registada correctamente.");
     } catch (err) {
@@ -175,9 +181,23 @@ function DetalleSocio() {
               <p>Permitidas: {resumen?.clasesPermitidas}</p>
               <p>Utilizadas: {resumen?.clasesUtilizadas}</p>
               <p>Restantes: {resumen?.clasesRestantes}</p>
+              <select
+                className="form-select mt-2 mb-2"
+                value={{ idHorario }}
+                onChange={(e) => setIdHorario(e.target.value)}
+              >
+                <option value="">--Seleccionar clase--</option>
+                {clases.map((c) => (
+                  <option key={c.idInscripcion} value={c.idHorario}>
+                    {c.nombreActividad} - {c.diaSemana}{" "}
+                    {c.horaInicio.slice(0, 5)}
+                  </option>
+                ))}
+              </select>
               <button
-                className="btn btn-primary mt-2"
+                className="btn btn-primary"
                 onClick={handleRegistrarAsistencia}
+                disabled={!idHorario}
               >
                 Registrar Asistencia
               </button>

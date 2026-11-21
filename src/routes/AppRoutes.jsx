@@ -7,6 +7,7 @@ import DetalleSocio from "../pages/DetalleSocio/DetalleSocio";
 import Pagos from "../pages/Pagos/Pagos";
 import Asistencias from "../pages/Asistencias/Asistencias";
 import PlanesPago from "../pages/PlanesPago/PlanesPago";
+import Horarios from "../pages/Horarios/Horarios";
 
 function AppRoutes() {
   return (
@@ -20,6 +21,7 @@ function AppRoutes() {
         <Route path="/pagos" element={<Pagos />} />
         <Route path="/asistencias" element={<Asistencias />} />
         <Route path="/planespago" element={<PlanesPago />} />
+        <Route path="/horarios" element={<Horarios />} />
       </Routes>
     </Layout>
   );

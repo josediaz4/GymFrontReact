@@ -24,3 +24,8 @@ export const invalidarAsistencia = async (id) => {
   const response = await apiClient.put(`/asistencias/${id}/invalidar`);
   return response.data;
 };
+
+export const registarAsistencia = async (idSocio, idHorario) => {
+  const response = await apiClient.post("/asistencias", { idSocio, idHorario });
+  return response.data;
+};
