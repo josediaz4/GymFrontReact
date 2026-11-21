@@ -1,8 +1,14 @@
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../context/useAuth";
 
 function Sidebar() {
+  const { usuario, logout } = useAuth();
+
   return (
-    <div className="bg-dark text-white vh-100 p-3" style={{ width: "250px" }}>
+    <div
+      className="bg-dark text-white vh-100 p-3 d-flex flex-column"
+      style={{ width: "250px" }}
+    >
       <h4 className="mb-4">🏋️ Gym-m@nu</h4>
       <div className="nav flex-column">
         <NavLink to="/dashboard" className="nav-link text-white">
@@ -31,6 +37,14 @@ function Sidebar() {
         <NavLink to="/horarios" className="nav-link text-white">
           🕒 Horarios
         </NavLink>
+      </div>
+      <div className="mt-auto border-top pt-3">
+        <small className="d-block text-truncate text-white-50 mb-2">
+          {usuario?.email}
+        </small>
+        <button className="btn btn-outline-light btn-sm w-100" onClick={logout}>
+          Cerrar sesión
+        </button>
       </div>
     </div>
   );
