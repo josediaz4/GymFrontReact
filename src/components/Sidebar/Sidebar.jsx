@@ -4,6 +4,11 @@ import { useAuth } from "../../context/useAuth";
 function Sidebar() {
   const { usuario, logout } = useAuth();
 
+  const handleLogout = () => {
+    logout();
+    window.location.replace("/"); // vuelve a la pag principal
+  };
+
   return (
     <div
       className="bg-dark text-white vh-100 p-3 d-flex flex-column"
@@ -42,7 +47,10 @@ function Sidebar() {
         <small className="d-block text-truncate text-white-50 mb-2">
           {usuario?.email}
         </small>
-        <button className="btn btn-outline-light btn-sm w-100" onClick={logout}>
+        <button
+          className="btn btn-outline-light btn-sm w-100"
+          onClick={handleLogout}
+        >
           Cerrar sesión
         </button>
       </div>

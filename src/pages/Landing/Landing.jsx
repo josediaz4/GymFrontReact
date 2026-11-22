@@ -1,5 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
+import {
+  getPlanesPublicos,
+  getHorariosPublicos,
+} from "../../services/publicoService";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./Landing.css";
 
@@ -16,56 +20,85 @@ const CINTA = [
   "MAÑANA, TARDE Y NOCHE",
 ];
 
-const PLANES = [
-  {
-    titulo: "CLASE",
-    img: "/img/img1.png",
-    texto:
-      "Podés asistir cuando vos lo desees, abonando la clase. Vos decidís cuándo.",
-    precio: "$6.000",
-    detalle: "Consultar cupos",
-  },
-  {
-    titulo: "3 VECES X SEMANA",
-    img: "/img/img2.avif",
-    texto:
-      "Podrás asistir en el rango horario que elijas, ya sea mañana, siesta o noche, entre lunes y viernes.",
-    precio: "$20.000",
-    detalle: "12 clases por mes",
-  },
-  {
-    titulo: "5 VECES X SEMANA",
-    img: "/img/img3.avif",
-    texto:
-      "Vas a entrenar de lunes a viernes, los 5 días de la semana, en el horario que elijas.",
-    precio: "$23.000",
-    detalle: "20 clases por mes",
-  },
-];
+// Las fotos se asignan por orden; los planes vienen de la base, ordenados por precio
+const IMAGENES = ["/img/img1.png", "/img/img2.avif", "/img/img3.avif"];
 
-const TURNOS = [
-  {
-    titulo: "Turnos Mañana",
-    dias: "Lunes, miércoles y viernes",
-    horas: ["8:00 a 9:00 hs", "9:00 a 10:00 hs"],
-  },
-  {
-    titulo: "Turnos Siesta",
-    dias: "Lunes a viernes",
-    horas: ["15:00 a 16:00 hs", "16:30 a 17:30 hs"],
-  },
-  {
-    titulo: "Turnos Noche",
-    dias: "Lunes a viernes",
-    horas: ["18:00 a 19:00 hs", "19:30 a 20:30 hs", "20:30 a 21:30 hs"],
-  },
-];
+const formatoMoneda = (valor) =>
+  new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    maximumFractionDigits: 0,
+  }).format(valor);
+
+const detallePlan = (plan) => {
+  const periodo =
+    plan.duracionDias === 1
+      ? "por día"
+      : plan.duracionDias === 30
+        ? "por mes"
+        : `cada ${plan.duracionDias} dias`;
+
+  return `${plan.cantidadClases} ${plan.cantidadClases === 1 ? "clase" : "clases"} ${periodo}`;
+};
+
+const ABREV_DIAS = {
+  Lunes: "Lun",
+  Martes: "Mar",
+  Miercoles: "Mié",
+  Jueves: "Jue",
+  Viernes: "Vie",
+  Sabado: "Sáb",
+  Domingo: "Dom",
+};
+
+const hhmm = (hora) => hora.slice(0, 5); // "08:00:00" -> "08:00"
+const sinCero = (hora) => hhmm(hora).replace(/^0/, ""); // "08:00" -> "8:00"
+
+const nombreTurno = (hora) => {
+  const h = parseInt(hora.slice(0, 2), 10);
+  return h < 13 ? "Mañana" : h < 18 ? "Siesta" : "Noche";
+};
+
+// Agrupa las clases en Mañana / Siesta / Noche y junta los días
+// que comparten el mismo rango horario
+const agruparTurnos = (horarios) => {
+  const turnos = { Mañana: {}, Siesta: {}, Noche: {} };
+
+  horarios.forEach((h) => {
+    const clave = `${hhmm(h.horaInicio)}|${hhmm(h.horaFin)}`;
+    const rangos = turnos[nombreTurno(h.horaInicio)];
+    rangos[clave] ??= { inicio: h.horaInicio, fin: h.horaFin, dias: new Set() };
+    rangos[clave].dias.add(h.diaSemana);
+  });
+
+  return Object.entries(turnos)
+    .filter(([, rangos]) => Object.keys(rangos).length > 0)
+    .map(([nombre, rangos]) => ({
+      nombre: `Turnos ${nombre}`,
+      rangos: Object.keys(rangos)
+        .sort()
+        .map((clave) => {
+          const r = rangos[clave];
+          return {
+            rango: `${sinCero(r.inicio)} a ${sinCero(r.fin)} hs`,
+            dias: Object.keys(ABREV_DIAS)
+              .filter((d) => r.dias.has(d))
+              .map((d) => ABREV_DIAS[d])
+              .join(", "),
+          };
+        }),
+    }));
+};
 
 const linkWhatsapp = (texto) =>
   `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
 
 function Landing() {
   const videoRef = useRef(null);
+  const [planes, setPlanes] = useState([]);
+  const [turnos, setTurnos] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [errorDatos, setErrorDatos] = useState(false);
   const [contacto, setContacto] = useState({
     nombre: "",
     email: "",
@@ -75,11 +108,23 @@ function Landing() {
   // React no siempre aplica el atributo "muted" a tiempo y el navegador
   // bloquea el autoplay; lo forzamos.
   useEffect(() => {
-    const video = videoRef.current;
-    if (video) {
-      video.muted = true;
-      video.play().catch(() => {});
-    }
+    const cargarDatos = async () => {
+      try {
+        const [planesData, horariosData] = await Promise.all([
+          getPlanesPublicos(),
+          getHorariosPublicos(),
+        ]);
+        setPlanes(planesData);
+        setTurnos(agruparTurnos(horariosData));
+        console.log(planes);
+      } catch (err) {
+        console.error(err);
+        setErrorDatos(true);
+      } finally {
+        setCargando(false);
+      }
+    };
+    cargarDatos();
   }, []);
 
   const handleChange = (e) => {
@@ -221,26 +266,46 @@ function Landing() {
 
       {/* Planes */}
       <section id="precios" className="container my-5 py-5">
-        <div className="row">
-          {PLANES.map((plan) => (
-            <div className="col-md-4 mb-4 mb-md-0" key={plan.titulo}>
+        {cargando && <p className="text-center">Cargando planes...</p>}
+
+        {!cargando && planes.length === 0 && (
+          <p className="text-center">
+            {errorDatos
+              ? "No pudimos cargar los planes."
+              : "Pronto vamos a publicar nuestros planes."}{" "}
+            <a
+              href={linkWhatsapp("Hola! Quisiera consultar los planes.")}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Consultanos por WhatsApp
+            </a>
+          </p>
+        )}
+
+        <div className="row justify-content-center">
+          {planes.map((plan, i) => (
+            <div className="col-md-4 mb-4" key={`${plan.nombrePlan}-${i}`}>
               <div className="card bg-dark text-light h-100">
                 <img
-                  src={plan.img}
+                  src={IMAGENES[i % IMAGENES.length]}
                   className="card-img-top p-1"
-                  alt={plan.titulo}
+                  alt={plan.nombrePlan}
                 />
-                <div className="card-body text-center">
-                  <h5 className="card-title">{plan.titulo}</h5>
-                  <p className="card-text">{plan.texto}</p>
-                  <div className="mb-3">
-                    <h4 className="fs-1 mb-0 fw-bold">{plan.precio}</h4>
-                    <small className="opacity-75">{plan.detalle}</small>
+                <div className="card-body text-center d-flex flex-column">
+                  <h5 className="card-title">
+                    {plan.nombrePlan.toUpperCase()}
+                  </h5>
+                  <div className="my-3">
+                    <h4 className="fs-1 mb-0 fw-bold">
+                      {formatoMoneda(plan.precio)}
+                    </h4>
+                    <small className="opacity-75">{detallePlan(plan)}</small>
                   </div>
-                  <div className="my-3 d-grid gap-2">
+                  <div className="mt-auto d-grid gap-2">
                     <a
                       href={linkWhatsapp(
-                        `Hola! Me interesa el plan "${plan.titulo}".`,
+                        `Hola! Me interesa el plan "${plan.nombrePlan}".`,
                       )}
                       target="_blank"
                       rel="noreferrer"
@@ -292,25 +357,37 @@ function Landing() {
       <section id="mapa" className="container my-5 py-5">
         <div className="row">
           <div className="col-md-6 text-center mb-5 mb-md-0">
-            <div className="horarios my-4">
+            <div class="horarios my-4">
               <h2>
-                <i className="bi bi-clock me-2" /> Horarios
+                <i class="bi bi-clock me-2"></i> Horarios
               </h2>
-              {TURNOS.map((turno) => (
-                <div key={turno.titulo} className="mt-4">
-                  <div className="d-inline-block rounded bg-warning text-dark px-4 py-2">
-                    <h5 className="fw-bold">{turno.titulo}</h5>
-                    <p className="mb-0">{turno.dias}</p>
-                  </div>
-                  <p className="mt-2 mb-0 fw-bold">
-                    {turno.horas.map((hora) => (
-                      <span key={hora} className="d-block">
-                        {hora}
-                      </span>
-                    ))}
-                  </p>
+              <div>
+                <div class="d-inline-block rounded bg-warning text-dark px-3 py-2">
+                  <h5 class="fw-bold">Turnos Mañana</h5>
+                  <p>Lunes Miercoles y Viernes</p>
                 </div>
-              ))}
+                <p class="mt-0 font-bold">
+                  8:00 a 9:00hs <br /> 9:00 a 10:00hs
+                </p>
+              </div>
+              <div>
+                <div class="d-inline-block rounded bg-warning text-dark px-5 py-2">
+                  <h5 class="fw-bold">Turnos Siesta</h5>
+                  <p>Lunes a Viernes</p>
+                </div>
+                <p class="mt-0 font-bold">
+                  15:00 a 16:00hs <br /> 16:30 a 17:30hs
+                </p>
+              </div>
+              <div>
+                <div class="d-inline-block rounded bg-warning text-dark px-5 py-2">
+                  <h5 class="fw-bold">Turnos Noche</h5>
+                  <p>Lunes a Viernes</p>
+                </div>
+                <p class="my-0 font-bold">18:00 a 19:00hs</p>
+                <p class="my-0 font-bold">19:30 a 20:30hs</p>
+                <p class="my-0 font-bold">20:30 a 21:30hs</p>
+              </div>
             </div>
           </div>
 

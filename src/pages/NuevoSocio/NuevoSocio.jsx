@@ -1,25 +1,33 @@
 import { useEffect, useState } from "react";
 import { getPlanes } from "../../services/planesService";
+import { getHorarios } from "../../services/horariosService";
 import { crearSocio } from "../../services/sociosService";
 import { toast } from "react-toastify";
 import { mensajeError } from "../../utils/mensajeError";
+import { descripcionClase } from "../../utils/horarios";
+
+const formVacio = {
+  nombre: "",
+  apellido: "",
+  dni: "",
+  email: "",
+  telefono: "",
+  idPlan: "",
+  metodoPago: "Efectivo",
+};
 
 function NuevoSocio() {
   const [planes, setPlanes] = useState([]);
-  const [formData, setFormData] = useState({
-    nombre: "",
-    apellido: "",
-    dni: "",
-    email: "",
-    telefono: "",
-    idPlan: "",
-    metodoPago: "Efectivo",
-  });
-  const [mensaje, setMensaje] = useState("");
+  const [horarios, setHorarios] = useState([]);
+  const [formData, setFormData] = useState(formVacio);
+  const [clasesElegidas, setClasesElegidas] = useState([]); // ids de horarios
+  const [claseSeleccionada, setClaseSeleccionada] = useState("");
   const [error, setError] = useState("");
+  const [guardando, setGuardando] = useState(false);
 
   useEffect(() => {
     cargarPlanes();
+    cargarHorarios();
   }, []);
 
   const cargarPlanes = async () => {
@@ -32,6 +40,37 @@ function NuevoSocio() {
     }
   };
 
+  const cargarHorarios = async () => {
+    try {
+      setHorarios(await getHorarios());
+    } catch (err) {
+      console.error(err);
+      toast.error(mensajeError(err, "Error al cargar las clases."));
+    }
+  };
+
+  const cuposLibres = (h) => h.capacidadMaxima - h.inscriptos;
+
+  //Clases con cupo y q todavia no se agregaron
+  const clasesDisponibles = formData.idPlan
+    ? horarios.filter(
+        (h) => cuposLibres(h) > 0 && !clasesElegidas.includes(h.idHorario),
+      )
+    : [];
+
+  const clasesElegidasDetalles = clasesElegidas
+    .map((id) => horarios.find((h) => h.idHorario === id))
+    .filter(Boolean);
+
+  const agregarClase = () => {
+    if (!formData.idPlan || !claseSeleccionada) return;
+    setClasesElegidas([...clasesElegidas, parseInt(claseSeleccionada)]);
+    setClaseSeleccionada("");
+  };
+
+  const quitarClase = (idHorario) =>
+    setClasesElegidas(clasesElegidas.filter((id) => id !== idHorario));
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -41,29 +80,26 @@ function NuevoSocio() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    setMensaje("");
     setError("");
+    setGuardando(true);
 
     try {
       await crearSocio({
         ...formData,
         idPlan: parseInt(formData.idPlan),
+        idsHorarios: clasesElegidas,
       });
       toast.success("Socio creado correctamente.");
 
-      setFormData({
-        nombre: "",
-        apellido: "",
-        dni: "",
-        email: "",
-        telefono: "",
-        idPlan: "",
-        metodoPago: "Efectivo",
-      });
+      setFormData(formVacio);
+      setClasesElegidas([]);
+      setClaseSeleccionada("");
     } catch (err) {
-      console.log(err);
+      console.error(err);
       toast.error(mensajeError(err, "No se pudo crear el socio."));
+    } finally {
+      setGuardando(false);
+      await cargarHorarios(); //refrescar los cupos
     }
   };
 
@@ -75,8 +111,6 @@ function NuevoSocio() {
         </div>
 
         <div className="card-body">
-          {mensaje && <div className="alert alert-success">{mensaje}</div>}
-
           {error && <div className="alert alert-danger">{error}</div>}
 
           <form onSubmit={handleSubmit}>
@@ -176,8 +210,66 @@ function NuevoSocio() {
                 </select>
               </div>
             </div>
-            <button type="submit" className="btn btn-success">
-              Guardar Socio
+            <hr />
+
+            <h5>Clases</h5>
+            <p className="text-muted small">
+              Opcional. Podés inscribirlo en una o más clases ahora; también se
+              puede hacer después desde Horarios → Inscriptos.
+            </p>
+
+            <div className="d-flex gap-2 mb-3">
+              <select
+                className="form-select"
+                value={claseSeleccionada}
+                onChange={(e) => setClaseSeleccionada(e.target.value)}
+                disabled={!formData.idPlan}
+              >
+                <option value="">
+                  {formData.idPlan
+                    ? "--Seleccionar clase--"
+                    : "Primero seleccioná un plan"}
+                </option>
+                {clasesDisponibles.map((h) => (
+                  <option key={h.idHorario} value={h.idHorario}>
+                    {descripcionClase(h)} ({cuposLibres(h)} cupos)
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                className="btn btn-outline-success text-nowrap"
+                onClick={agregarClase}
+                disabled={!formData || !claseSeleccionada}
+              >
+                Agregar
+              </button>
+            </div>
+
+            <div className="d-flex flex-wrap gap-2 mb-4">
+              {clasesElegidasDetalles.map((h) => (
+                <span
+                  key={h.idHorario}
+                  className="badge bg-secondary d-flex align-items-center gap-2 fs-6 fw-normal"
+                >
+                  {descripcionClase(h)}
+                  <button
+                    type="button"
+                    className="btn-close btn-close-white"
+                    style={{ fontSize: "0.6rem" }}
+                    aria-label="Quitar"
+                    onClick={() => quitarClase(h.idHorario)}
+                  />
+                </span>
+              ))}
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-success"
+              disabled={guardando}
+            >
+              {guardando ? "Guardando..." : "Guardar Socio"}
             </button>
           </form>
         </div>
