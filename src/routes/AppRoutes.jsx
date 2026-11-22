@@ -10,10 +10,12 @@ import PlanesPago from "../pages/PlanesPago/PlanesPago";
 import Horarios from "../pages/Horarios/Horarios";
 import Login from "../pages/Login/Login";
 import RutaProtegida from "./RutaProtegida";
+import Landing from "../pages/Landing/Landing";
 
 function AppRoutes() {
   return (
     <Routes>
+      <Route path="/" element={<Landing />} />
       <Route path="login" element={<Login />} />
 
       <Route element={<RutaProtegida />}>
@@ -24,7 +26,6 @@ function AppRoutes() {
             </Layout>
           }
         >
-          <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/socios" element={<Socios />} />
           <Route path="/socios/nuevo" element={<NuevoSocio />} />
@@ -36,7 +37,7 @@ function AppRoutes() {
         </Route>
       </Route>
 
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
