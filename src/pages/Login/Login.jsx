@@ -37,7 +37,7 @@ function Login() {
   return (
     <div className="login-page">
       <section className="login-hero">
-        <div className="login-brand">🏋️ Gym-m@nu</div>
+        <div className="login-brand">Pitbull Gym</div>
         <div>
           <h1 className="login-title">
             Entrená

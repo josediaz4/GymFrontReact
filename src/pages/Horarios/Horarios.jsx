@@ -251,56 +251,58 @@ function Horarios() {
       </div>
       <div className="card show">
         <div className="card-body">
-          <table className="table table-striped">
-            <thead>
-              <tr>
-                <th>Actividad</th>
-                <th>Día</th>
-                <th>Horario</th>
-                <th>Capacidad</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {horariosFiltrados.map((h) => (
-                <tr key={h.idHorario}>
-                  <td>{h.nombreActividad}</td>
-                  <td>{etiquetaDia(h.diaSemana)}</td>
-                  <td>
-                    {recortarHora(h.horaInicio)} - {recortarHora(h.horaFin)}
-                  </td>
-                  <td>{h.capacidadMaxima}</td>
-                  <td className="d-flex gap-2">
-                    <button
-                      className="btn btn-info btn-sm text-white"
-                      onClick={() => abrirInscriptos(h)}
-                    >
-                      Inscriptos
-                    </button>
-                    <button
-                      className="btn btn-primary btn-sm"
-                      onClick={() => abrirModalEditar(h)}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      className="btn btn-danger btn-sm"
-                      onClick={() => handleEliminar(h)}
-                    >
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {horariosFiltrados.length === 0 && (
+          <div className="table-responsive">
+            <table className="table table-striped">
+              <thead>
                 <tr>
-                  <td colSpan="5" className="text-center text-muted">
-                    No hay clases cargadas.
-                  </td>
+                  <th>Actividad</th>
+                  <th>Día</th>
+                  <th>Horario</th>
+                  <th>Capacidad</th>
+                  <th>Acciones</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {horariosFiltrados.map((h) => (
+                  <tr key={h.idHorario}>
+                    <td>{h.nombreActividad}</td>
+                    <td>{etiquetaDia(h.diaSemana)}</td>
+                    <td>
+                      {recortarHora(h.horaInicio)} - {recortarHora(h.horaFin)}
+                    </td>
+                    <td>{h.capacidadMaxima}</td>
+                    <td className="d-flex gap-2">
+                      <button
+                        className="btn btn-info btn-sm text-white"
+                        onClick={() => abrirInscriptos(h)}
+                      >
+                        Inscriptos
+                      </button>
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={() => abrirModalEditar(h)}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleEliminar(h)}
+                      >
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {horariosFiltrados.length === 0 && (
+                  <tr>
+                    <td colSpan="5" className="text-center text-muted">
+                      No hay clases cargadas.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
       {mostrarModal && (
