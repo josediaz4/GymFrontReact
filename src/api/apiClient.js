@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "https://pibullgym.runasp.net/",
+  baseURL: "https://pibullgym.runasp.net/api",
 });
 
 //adjuntamos el token a cada request
